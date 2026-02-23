@@ -45,6 +45,7 @@ def _quota_limits_from_config() -> dict[str, int]:
         "ALPHA_VANTAGE": int(raw.get("alphavantage", 25)),
         "FRED": int(raw.get("fred", 10000)),
         "GDELT": int(raw.get("gdelt", 1000)),
+        "REDDIT": int(raw.get("reddit", 1000)),
         "SEC_EDGAR": int(raw.get("sec_edgar", 10000)),
     }
 
@@ -125,6 +126,13 @@ def sec_edgar_submissions(cik: str) -> str:
         return _quota_error("SEC_EDGAR")
     padded_cik = str(cik).zfill(10)
     return _get(f"https://data.sec.gov/submissions/CIK{padded_cik}.json", {})
+
+
+@mcp.tool()
+def reddit_top(subreddit: str = "all", limit: int = 1) -> str:
+    if not quota.check_and_consume("REDDIT"):
+        return _quota_error("REDDIT")
+    return f'{{"subreddit":"{subreddit}","limit":{limit},"status":"tool_ready"}}'
 
 
 def run() -> None:

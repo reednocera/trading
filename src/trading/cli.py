@@ -3,7 +3,7 @@ from __future__ import annotations
 import typer
 
 from trading.main import implementation_plan, run_decision, run_schedule_probe
-from trading.setup import maybe_run_setup_wizard, reset_setup
+from trading.setup import maybe_run_setup_wizard
 
 app = typer.Typer(no_args_is_help=True)
 
@@ -12,12 +12,6 @@ app = typer.Typer(no_args_is_help=True)
 def setup_cmd() -> None:
     maybe_run_setup_wizard()
 
-
-
-
-@app.command("reset")
-def reset_cmd() -> None:
-    reset_setup()
 
 @app.command("plan")
 def plan_cmd() -> None:

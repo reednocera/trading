@@ -94,3 +94,4 @@ mcp:
     alphavantage: 25
     fred: 10000
     gdelt: 1000
+    reddit: 1000
