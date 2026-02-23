@@ -35,7 +35,6 @@ class KeySpec:
     env_name: str
     prompt: str
     validator_name: str
-    required: bool = True
 
 
 class SetupWizard:
@@ -48,61 +47,30 @@ class SetupWizard:
             KeySpec("TWELVE_DATA_API_KEY", "Twelve Data API key", "validate_twelve_data"),
             KeySpec("ALPHA_VANTAGE_API_KEY", "Alpha Vantage API key", "validate_alpha_vantage"),
             KeySpec("FRED_API_KEY", "FRED API key", "validate_fred"),
-            KeySpec("GDELT_API_KEY", "GDELT key/token (optional, use 'NONE' if not required)", "validate_gdelt", required=False),
-            KeySpec("REDDIT_CLIENT_ID", "Reddit client id (optional)", "validate_reddit", required=False),
-            KeySpec("REDDIT_CLIENT_SECRET", "Reddit client secret (optional)", "validate_reddit", required=False),
-            KeySpec("REDDIT_USER_AGENT", "Reddit user agent (optional)", "validate_reddit", required=False),
+            KeySpec("REDDIT_CLIENT_ID", "Reddit client id", "validate_reddit"),
+            KeySpec("REDDIT_CLIENT_SECRET", "Reddit client secret", "validate_reddit"),
+            KeySpec("REDDIT_USER_AGENT", "Reddit user agent", "validate_reddit"),
+            KeySpec("GDELT_API_KEY", "GDELT key/token (optional, use 'NONE' if not required)", "validate_gdelt"),
         ]
 
     def has_all_required(self) -> bool:
-        required = [k.env_name for k in self.key_specs if k.required]
+        required = [k.env_name for k in self.key_specs if k.env_name != "GDELT_API_KEY"]
         return all(bool(os.getenv(name)) for name in required)
-
-    def clear_existing(self) -> None:
-        for spec in self.key_specs:
-            os.environ.pop(spec.env_name, None)
-        if self.env_path.exists():
-            self.env_path.unlink()
 
     def run(self) -> None:
         validated: dict[str, str] = {}
         for spec in self.key_specs:
             validator: Callable[[str], bool] = getattr(self, spec.validator_name)
             while True:
-                existing = os.getenv(spec.env_name)
-                if existing:
-                    candidate = existing.strip()
-                elif spec.required:
-                    candidate = console.input(f"{spec.prompt}: ").strip()
-                else:
-                    # Optional providers are truly optional; skip prompt unless preset.
-                    break
-
-                if not candidate:
-                    if spec.required:
-                        console.print(f"{spec.env_name} is required.")
-                        continue
-                    break
-
-                if spec.validator_name == "validate_reddit" and not spec.required:
-                    validated[spec.env_name] = candidate
-                    os.environ[spec.env_name] = candidate
-                    console.print(f"OK {spec.env_name} (optional, no canary required)")
-                    break
-
+                candidate = os.getenv(spec.env_name) or console.input(f"{spec.prompt}: ").strip()
                 ok = validator(candidate)
                 if ok:
                     validated[spec.env_name] = candidate
                     os.environ[spec.env_name] = candidate
                     console.print(f"OK {spec.env_name}")
                     break
-
-                if spec.required:
-                    console.print(f"Canary failed for {spec.env_name}. Please re-enter.")
-                    if existing:
-                        break
-                else:
-                    console.print(f"Skipping optional {spec.env_name}; validation failed.")
+                console.print(f"Canary failed for {spec.env_name}. Please re-enter.")
+                if os.getenv(spec.env_name):
                     break
 
         self._write_env(validated)
@@ -202,11 +170,4 @@ def maybe_run_setup_wizard() -> None:
     if wizard.has_all_required():
         return
     console.print("Configuration missing; launching setup wizard.")
-    wizard.run()
-
-
-def reset_setup() -> None:
-    wizard = SetupWizard()
-    console.print("Resetting setup: clearing stored environment keys and restarting install wizard.")
-    wizard.clear_existing()
     wizard.run()

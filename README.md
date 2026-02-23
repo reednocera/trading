@@ -9,14 +9,9 @@ Updated scaffold implementing V2.1 overrides with:
 
 ## CLI
 - `trading setup` - run setup wizard and write validated `.env`
-- `trading reset` - clear saved setup values and rerun install wizard from scratch
 - `trading plan`
 - `trading run-decision`
 - `trading run-schedule`
 
 ## Notes
 This remains scaffold-first and intentionally defers full production integrations.
-
-
-## Setup notes
-- Reddit credentials are optional and are no longer required to complete setup or run core flows.
