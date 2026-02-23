@@ -24,3 +24,19 @@
   - `<market_data>` with repeated `<asset>` blocks containing `<symbol>`, `<status>`, and `<features>`
   - `<instructions>`
 - `<execution_orders>` parser accepts JSON array only.
+
+
+## Provider matrix
+| Provider | Purpose | Status |
+| --- | --- | --- |
+| Anthropic | Strategy director LLM routing/decisioning | Supported |
+| Finnhub | Market data | Supported |
+| Financial Modeling Prep (FMP) | Market/fundamental data | Supported |
+| Twelve Data | Time series market data | Supported |
+| Alpha Vantage | Market data | Supported |
+| FRED | Macro-economic data | Supported |
+| GDELT | News/event data | Supported (optional key) |
+| Reddit | Social sentiment data | **Not integrated intentionally** |
+
+### Migration note for older branches/configs
+Remove lingering `REDDIT_*` variables from local environments and config stores (`REDDIT_CLIENT_ID`, `REDDIT_CLIENT_SECRET`, `REDDIT_USER_AGENT`).
