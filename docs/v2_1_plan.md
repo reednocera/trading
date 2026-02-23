@@ -24,3 +24,11 @@
   - `<market_data>` with repeated `<asset>` blocks containing `<symbol>`, `<status>`, and `<features>`
   - `<instructions>`
 - `<execution_orders>` parser accepts JSON array only.
+
+## Unsupported data source policy
+
+Reddit is intentionally unsupported in this codebase.
+
+Contributors should not add Reddit or PRAW dependencies, API keys, MCP tools, quotas, or documentation references in `src`, `tests`, `config`, `pyproject.toml`, or `README.md`.
+
+CI enforces this with a guard step that fails when those references are present.

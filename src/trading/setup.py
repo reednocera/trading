@@ -47,9 +47,6 @@ class SetupWizard:
             KeySpec("TWELVE_DATA_API_KEY", "Twelve Data API key", "validate_twelve_data"),
             KeySpec("ALPHA_VANTAGE_API_KEY", "Alpha Vantage API key", "validate_alpha_vantage"),
             KeySpec("FRED_API_KEY", "FRED API key", "validate_fred"),
-            KeySpec("REDDIT_CLIENT_ID", "Reddit client id", "validate_reddit"),
-            KeySpec("REDDIT_CLIENT_SECRET", "Reddit client secret", "validate_reddit"),
-            KeySpec("REDDIT_USER_AGENT", "Reddit user agent", "validate_reddit"),
             KeySpec("GDELT_API_KEY", "GDELT key/token (optional, use 'NONE' if not required)", "validate_gdelt"),
         ]
 
@@ -126,22 +123,6 @@ class SetupWizard:
             "https://api.stlouisfed.org/fred/series",
             {"series_id": "GNP", "api_key": key, "file_type": "json"},
         )
-
-    def validate_reddit(self, _unused: str) -> bool:
-        if importlib.util.find_spec("praw") is None:
-            return False
-        praw = importlib.import_module("praw")
-        client_id = os.getenv("REDDIT_CLIENT_ID", "")
-        client_secret = os.getenv("REDDIT_CLIENT_SECRET", "")
-        user_agent = os.getenv("REDDIT_USER_AGENT", "trading-setup-wizard")
-        if not client_id or not client_secret:
-            return False
-        try:
-            reddit = praw.Reddit(client_id=client_id, client_secret=client_secret, user_agent=user_agent)
-            next(reddit.subreddit("all").top(limit=1))
-            return True
-        except Exception:
-            return False
 
     def validate_gdelt(self, key: str) -> bool:
         _ = key
