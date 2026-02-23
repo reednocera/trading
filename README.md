@@ -15,3 +15,7 @@ Updated scaffold implementing V2.1 overrides with:
 
 ## Notes
 This remains scaffold-first and intentionally defers full production integrations.
+
+
+## Setup notes
+- Reddit credentials are optional and are no longer required to complete setup or run core flows.

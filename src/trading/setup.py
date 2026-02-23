@@ -35,6 +35,7 @@ class KeySpec:
     env_name: str
     prompt: str
     validator_name: str
+    required: bool = True
 
 
 class SetupWizard:
@@ -47,14 +48,14 @@ class SetupWizard:
             KeySpec("TWELVE_DATA_API_KEY", "Twelve Data API key", "validate_twelve_data"),
             KeySpec("ALPHA_VANTAGE_API_KEY", "Alpha Vantage API key", "validate_alpha_vantage"),
             KeySpec("FRED_API_KEY", "FRED API key", "validate_fred"),
-            KeySpec("REDDIT_CLIENT_ID", "Reddit client id", "validate_reddit"),
-            KeySpec("REDDIT_CLIENT_SECRET", "Reddit client secret", "validate_reddit"),
-            KeySpec("REDDIT_USER_AGENT", "Reddit user agent", "validate_reddit"),
-            KeySpec("GDELT_API_KEY", "GDELT key/token (optional, use 'NONE' if not required)", "validate_gdelt"),
+            KeySpec("GDELT_API_KEY", "GDELT key/token (optional, use 'NONE' if not required)", "validate_gdelt", required=False),
+            KeySpec("REDDIT_CLIENT_ID", "Reddit client id (optional)", "validate_reddit", required=False),
+            KeySpec("REDDIT_CLIENT_SECRET", "Reddit client secret (optional)", "validate_reddit", required=False),
+            KeySpec("REDDIT_USER_AGENT", "Reddit user agent (optional)", "validate_reddit", required=False),
         ]
 
     def has_all_required(self) -> bool:
-        required = [k.env_name for k in self.key_specs if k.env_name != "GDELT_API_KEY"]
+        required = [k.env_name for k in self.key_specs if k.required]
         return all(bool(os.getenv(name)) for name in required)
 
     def run(self) -> None:
@@ -62,15 +63,37 @@ class SetupWizard:
         for spec in self.key_specs:
             validator: Callable[[str], bool] = getattr(self, spec.validator_name)
             while True:
-                candidate = os.getenv(spec.env_name) or console.input(f"{spec.prompt}: ").strip()
+                existing = os.getenv(spec.env_name)
+                if existing:
+                    candidate = existing.strip()
+                else:
+                    candidate = console.input(f"{spec.prompt}: ").strip()
+
+                if not candidate:
+                    if spec.required:
+                        console.print(f"{spec.env_name} is required.")
+                        continue
+                    break
+
+                if spec.validator_name == "validate_reddit" and not spec.required:
+                    validated[spec.env_name] = candidate
+                    os.environ[spec.env_name] = candidate
+                    console.print(f"OK {spec.env_name} (optional, no canary required)")
+                    break
+
                 ok = validator(candidate)
                 if ok:
                     validated[spec.env_name] = candidate
                     os.environ[spec.env_name] = candidate
                     console.print(f"OK {spec.env_name}")
                     break
-                console.print(f"Canary failed for {spec.env_name}. Please re-enter.")
-                if os.getenv(spec.env_name):
+
+                if spec.required:
+                    console.print(f"Canary failed for {spec.env_name}. Please re-enter.")
+                    if existing:
+                        break
+                else:
+                    console.print(f"Skipping optional {spec.env_name}; validation failed.")
                     break
 
         self._write_env(validated)
@@ -126,6 +149,7 @@ class SetupWizard:
             "https://api.stlouisfed.org/fred/series",
             {"series_id": "GNP", "api_key": key, "file_type": "json"},
         )
+
 
     def validate_reddit(self, _unused: str) -> bool:
         if importlib.util.find_spec("praw") is None:
