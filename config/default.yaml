@@ -1,0 +1,96 @@
+runtime:
+  mode: live
+
+backtest:
+  clock_start: "2025-01-06T08:00:00Z"
+  clock_end: "2025-01-10T16:30:00Z"
+  daily_notional_min: 5000
+  daily_notional_max: 10000
+  simulated_wait_seconds: 2
+
+models:
+  input_filter_heavy: claude-4-6-sonnet-latest
+  input_filter_intraday: claude-4-5-haiku-latest
+  strategy_director: claude-4-6-opus-latest
+  execution_translator: claude-4-5-haiku-latest
+  post_market_analyst: claude-4-6-sonnet-latest
+
+anthropic:
+  sdk_version_range: ">=0.80.0"
+  thinking: adaptive
+  xml_repair_max_retries: 2
+
+schedule:
+  timezone: America/New_York
+  windows:
+    premarket: "08:00"
+    open_plus_minutes: 20
+    noon: "12:00"
+    close: "15:45"
+    reflection: "16:30"
+  adaptive:
+    quiet_interval_minutes: 90
+    active_interval_minutes: 30
+    max_interval_minutes: 120
+    high_event_velocity_threshold: 0.7
+    high_quota_pressure_threshold: 0.85
+
+universe:
+  holdings:
+    - AAPL
+    - MSFT
+    - NVDA
+    - AMZN
+    - META
+    - GOOGL
+    - TSLA
+    - AMD
+    - NFLX
+    - AVGO
+  watchlist:
+    - JPM
+    - BAC
+    - XOM
+    - CVX
+    - UNH
+    - LLY
+    - PFE
+    - JNJ
+    - COST
+    - WMT
+    - HD
+    - NKE
+    - KO
+    - PEP
+    - DIS
+    - INTC
+    - QCOM
+    - ADBE
+    - CRM
+    - ORCL
+
+risk:
+  python_prechecks_enabled: true
+  hard_killswitch_enabled: false
+  min_edge_after_cost_pct: 0.75
+  min_win_prob: 0.52
+
+events:
+  earnings_window_days:
+    start: -1
+    end: 2
+
+mcp:
+  mode: multiplexed_local_server
+  enable_yahoo_fallback: true
+  enable_finnhub: true
+  enable_fmp: true
+  quotas:
+    yahoo: 100000
+    stooq: 100000
+    twelvedata: 800
+    finnhub: 50000
+    fmp: 250
+    alphavantage: 25
+    fred: 10000
+    gdelt: 1000

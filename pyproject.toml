@@ -1,0 +1,31 @@
+[project]
+name = "adaptive-paper-portfolio"
+version = "0.1.0"
+description = "Adaptive multi-agent paper portfolio scaffold (V2.1 override)"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "anthropic>=0.80.0",
+  "pydantic>=2.7.0",
+  "PyYAML>=6.0.1",
+  "sqlalchemy[asyncio]>=2.0.36",
+  "asyncpg>=0.30.0",
+  "alembic>=1.13.3",
+  "typer>=0.12.5",
+  "requests>=2.32.0",
+  "rich>=13.9.0",
+  "fastmcp>=0.1.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.3.0", "pytest-asyncio>=0.24.0", "ruff>=0.6.0"]
+
+[project.scripts]
+trading = "trading.cli:app"
+
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
