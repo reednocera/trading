@@ -9,7 +9,6 @@ Updated scaffold implementing V2.1 overrides with:
 
 ## CLI
 - `trading setup` - run setup wizard and write validated `.env`
-- `trading reset` - clear saved setup values and rerun install wizard from scratch
 - `trading plan`
 - `trading run-decision`
 - `trading run-schedule`

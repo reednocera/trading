@@ -58,12 +58,6 @@ class SetupWizard:
         required = [k.env_name for k in self.key_specs if k.required]
         return all(bool(os.getenv(name)) for name in required)
 
-    def clear_existing(self) -> None:
-        for spec in self.key_specs:
-            os.environ.pop(spec.env_name, None)
-        if self.env_path.exists():
-            self.env_path.unlink()
-
     def run(self) -> None:
         validated: dict[str, str] = {}
         for spec in self.key_specs:
@@ -156,6 +150,7 @@ class SetupWizard:
             {"series_id": "GNP", "api_key": key, "file_type": "json"},
         )
 
+
     def validate_reddit(self, _unused: str) -> bool:
         if importlib.util.find_spec("praw") is None:
             return False
@@ -199,11 +194,4 @@ def maybe_run_setup_wizard() -> None:
     if wizard.has_all_required():
         return
     console.print("Configuration missing; launching setup wizard.")
-    wizard.run()
-
-
-def reset_setup() -> None:
-    wizard = SetupWizard()
-    console.print("Resetting setup: clearing stored environment keys and restarting install wizard.")
-    wizard.clear_existing()
     wizard.run()

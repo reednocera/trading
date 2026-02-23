@@ -33,18 +33,3 @@ def test_optional_reddit_values_can_be_written_without_canary(monkeypatch, tmp_p
     wizard._write_env({"REDDIT_CLIENT_ID": "id", "REDDIT_CLIENT_SECRET": "secret", "REDDIT_USER_AGENT": "ua"})
     content = (tmp_path / ".env").read_text()
     assert "REDDIT_CLIENT_ID=id" in content
-
-
-def test_clear_existing_removes_env_and_file(monkeypatch, tmp_path):
-    env_file = tmp_path / ".env"
-    env_file.write_text("ANTHROPIC_API_KEY=x\n", encoding="utf-8")
-
-    monkeypatch.setenv("ANTHROPIC_API_KEY", "x")
-    monkeypatch.setenv("FINNHUB_API_KEY", "x")
-
-    wizard = SetupWizard(env_path=env_file)
-    wizard.clear_existing()
-
-    assert "ANTHROPIC_API_KEY" not in os.environ
-    assert "FINNHUB_API_KEY" not in os.environ
-    assert not env_file.exists()
