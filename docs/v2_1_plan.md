@@ -25,18 +25,10 @@
   - `<instructions>`
 - `<execution_orders>` parser accepts JSON array only.
 
+## Unsupported data source policy
 
-## Provider matrix
-| Provider | Purpose | Status |
-| --- | --- | --- |
-| Anthropic | Strategy director LLM routing/decisioning | Supported |
-| Finnhub | Market data | Supported |
-| Financial Modeling Prep (FMP) | Market/fundamental data | Supported |
-| Twelve Data | Time series market data | Supported |
-| Alpha Vantage | Market data | Supported |
-| FRED | Macro-economic data | Supported |
-| GDELT | News/event data | Supported (optional key) |
-| Reddit | Social sentiment data | **Not integrated intentionally** |
+Reddit is intentionally unsupported in this codebase.
 
-### Migration note for older branches/configs
-Remove lingering `REDDIT_*` variables from local environments and config stores (`REDDIT_CLIENT_ID`, `REDDIT_CLIENT_SECRET`, `REDDIT_USER_AGENT`).
+Contributors should not add Reddit or PRAW dependencies, API keys, MCP tools, quotas, or documentation references in `src`, `tests`, `config`, `pyproject.toml`, or `README.md`.
+
+CI enforces this with a guard step that fails when those references are present.
